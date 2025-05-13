@@ -1,0 +1,32 @@
+/*
+===============================================================================
+ Script:     Dimension Tables Exploration
+===============================================================================
+ Purpose:
+    - Explore the structure and unique values within dimension tables.
+    - Understand categorical attributes useful for filtering, grouping, and reporting.
+
+ SQL Functions Used:
+    - DISTINCT      : To identify unique values in columns.
+    - ORDER BY      : To sort data for easier readability and validation.
+
+ Use Case:
+    - Helps analysts validate dimension values and detect anomalies.
+    - Supports business logic refinement for reporting and dashboarding.
+
+===============================================================================
+*/
+
+-- Retrieve a list of unique countries from which customers originate
+SELECT DISTINCT 
+    country 
+FROM gold.dim_customers
+ORDER BY country;
+
+-- Retrieve a list of unique categories, subcategories, and products
+SELECT DISTINCT 
+    category, 
+    subcategory, 
+    product_name 
+FROM gold.dim_products
+ORDER BY category, subcategory, product_name;
