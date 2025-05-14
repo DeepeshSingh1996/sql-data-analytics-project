@@ -1,0 +1,41 @@
+/*
+===============================================================================
+Part-to-Whole Analysis
+===============================================================================
+Purpose:
+    - Compare individual segment contributions against the total to assess relative impact.
+    - Evaluate performance differences across categories, time periods, or test groups.
+    - Applicable for A/B testing, market share analysis, and regional comparisons.
+
+SQL Techniques Used:
+    - Aggregate Functions:
+        - SUM(): Calculates totals at both segment and overall levels.
+        - AVG(): Computes average values per category.
+    - Window Functions:
+        - SUM() OVER(): Derives total values across all segments for ratio or percentage calculations.
+
+Recommended Use Cases:
+    - Determining each product’s share of total sales.
+    - Measuring a segment’s contribution to overall revenue or customer base.
+    - Benchmarking regions or test/control groups against the aggregate.
+===============================================================================
+*/
+
+-- Which categories contribute the most to overall sales?
+
+WITH category_sales AS (
+    SELECT
+        p.category,
+        SUM(f.sales_amount) AS total_sales
+    FROM gold.fact_sales f
+    LEFT JOIN gold.dim_products p
+        ON p.product_key = f.product_key
+    GROUP BY p.category
+)
+SELECT
+    category,
+    total_sales,
+    SUM(total_sales) OVER () AS overall_sales,
+    ROUND((CAST(total_sales AS FLOAT) / SUM(total_sales) OVER ()) * 100, 2) AS percentage_of_total
+FROM category_sales
+ORDER BY total_sales DESC;
