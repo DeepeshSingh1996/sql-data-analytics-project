@@ -1,0 +1,53 @@
+/*
+===============================================================================
+Change Over Time Analysis
+===============================================================================
+Purpose:
+    - Analyze trends and growth patterns in key metrics over time.
+    - Identify seasonality or time-based behaviors in the data.
+    - Measure changes across consistent time intervals (e.g., monthly, yearly).
+
+SQL Functions Used:
+    - Date Functions: DATEPART(), FORMAT(), DATEADD(), DATEDIFF()
+    - Aggregate Functions: SUM(), COUNT(), AVG()
+
+Note:
+    - Use DATEADD + DATEDIFF to simulate DATETRUNC for SQL Server versions < 2022.
+    - Use FORMAT() cautiously in large datasets due to performance impact.
+===============================================================================
+*/
+
+-- Analyse sales performance over time
+-- Quick Date Functions
+SELECT
+    YEAR(order_date) AS order_year,
+    MONTH(order_date) AS order_month,
+    SUM(sales_amount) AS total_sales,
+    COUNT(DISTINCT customer_key) AS total_customers,
+    SUM(quantity) AS total_quantity
+FROM gold.fact_sales
+WHERE order_date IS NOT NULL
+GROUP BY YEAR(order_date), MONTH(order_date)
+ORDER BY YEAR(order_date), MONTH(order_date);
+
+-- Truncate order_date to the beginning of the month
+SELECT
+    DATEADD(MONTH, DATEDIFF(MONTH, 0, order_date), 0) AS order_month,
+    SUM(sales_amount) AS total_sales,
+    COUNT(DISTINCT customer_key) AS total_customers,
+    SUM(quantity) AS total_quantity
+FROM gold.fact_sales
+WHERE order_date IS NOT NULL
+GROUP BY DATEADD(MONTH, DATEDIFF(MONTH, 0, order_date), 0)
+ORDER BY DATEADD(MONTH, DATEDIFF(MONTH, 0, order_date), 0);
+
+-- FORMAT()
+SELECT
+    FORMAT(order_date, 'yyyy-MMM') AS order_date,
+    SUM(sales_amount) AS total_sales,
+    COUNT(DISTINCT customer_key) AS total_customers,
+    SUM(quantity) AS total_quantity
+FROM gold.fact_sales
+WHERE order_date IS NOT NULL
+GROUP BY FORMAT(order_date, 'yyyy-MMM')
+ORDER BY FORMAT(order_date, 'yyyy-MMM');
